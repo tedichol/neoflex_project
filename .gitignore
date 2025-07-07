@@ -1,3 +1,5 @@
-.venv/
-files_for_read
-text_files
+.venv/*
+files_for_read/
+text_files/
+__pycache__/
+*.pyc
