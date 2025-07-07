@@ -33,14 +33,16 @@ df_list = [df_ft_balance, df_md_account,
            df_md_currency, df_md_exchange_rate, df_md_ledger_account]
 table_list = ["ft_balance_f", "md_account_d",
            "md_currency_d", "md_exchange_rate_d", "md_ledger_account_s"]
-df_table_list = zip(df_list, table_list)
 
+df_table_list = zip(df_list, table_list)
+'''
 df_tables_pk = {"ft_balance_f": ["on_date", "account_rk"],
                 "ft_posting_f": [],
                 "md_account_d":["data_actual_date", "account_rk"],
                 "md_currency_d":["currency_rk", "data_actual_date"],
                 "md_exchange_rate_d":["data_actual_date", "currency_rk"],
                 "md_ledger_account_s":["ledger_account", "start_date"]}
+'''
 
 data_metadata_obj = MetaData()
 data_tables = create_data_tables(data_metadata_obj)
@@ -61,16 +63,17 @@ def upsert(table, connection, keys, data_iter):
         connection.execute(stmt)
     except Exception as e:
         print(f"Ошибка: {e}")
-        raise'''
-
+        raise
+'''
 #очищаем таблицу логов
 with engine.begin() as conn:
     conn.execute(text("TRUNCATE TABLE logs.logs"))
 
 #запись таблиц
 with engine.connect() as conn:
-    conn.execute(text("INSERT INTO logs.logs VALUES (LOCALTIMESTAMP, 'Таблицы считаны и обработаны. Начали загрузку')"))
+    conn.execute(text("INSERT INTO logs.logs VALUES (LOCALTIMESTAMP, 'Таблицы считаны и обработаны')"))
     for (df, table_name) in df_table_list:
+        conn.execute(text(f"INSERT INTO logs.logs VALUES (LOCALTIMESTAMP, 'Началось заполнение таблицы {table_name}')"))
         table = data_tables[table_name]
         data = df.to_dict("records")
         conflict_columns = [col.name for col in table.primary_key.columns]
@@ -79,17 +82,18 @@ with engine.connect() as conn:
                 index_elements = conflict_columns,
                 set_ = {k: v for k, v in record.items() if k not in conflict_columns})
             conn.execute(db_insert)
-        conn.execute(text(f"INSERT INTO logs.logs VALUES (LOCALTIMESTAMP, 'Добавлены данные в таблицу {table_name}')"))
+        conn.execute(text(f"INSERT INTO logs.logs VALUES (LOCALTIMESTAMP, 'Таблица {table_name} заполнена')"))
         conn.commit()
 
 #запись для таблицы без первичного ключа
 with engine.begin() as conn:
     conn.execute(text("TRUNCATE TABLE ds.ft_posting_f"))
+    conn.execute(text(f"INSERT INTO logs.logs VALUES (LOCALTIMESTAMP, 'Началось заполнение таблицы ds.ft_posting_f')"))
     table = data_tables["ft_posting_f"]
     data = df_ft_posting.to_dict("records")
     db_insert = pg_insert(table).values(data)
     conn.execute(db_insert)
-    conn.execute(text("INSERT INTO logs.logs VALUES (LOCALTIMESTAMP, 'Добавлены данные в таблицу ft_posting_f')"))
+    conn.execute(text("INSERT INTO logs.logs VALUES (LOCALTIMESTAMP, 'Таблица ds.ft_posting_f заполнена')"))
 
 #таймер на 5 секунд
 time.sleep(5)

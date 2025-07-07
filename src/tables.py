@@ -1,4 +1,5 @@
 import pandas as pd
+from psycopg2 import Timestamp
 from sqlalchemy import (Table, Column, Float, Integer, Numeric,
                         Date, String, PrimaryKeyConstraint, CHAR)
 
@@ -6,8 +7,8 @@ def create_log_tables(metadata) -> dict[str, pd.DataFrame]:
      return {"logs": Table(
         "logs",
         metadata,
-        Column("start_time", Date,),
-        Column("Description", String),
+        Column("time_point", Timestamp,),
+        Column("Description", String,),
     )
     }
 
