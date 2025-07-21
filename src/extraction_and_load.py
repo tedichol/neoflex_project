@@ -2,7 +2,7 @@ import time
 from sqlalchemy import *
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 import pandas as pd
-from tables import create_data_tables, create_log_tables
+from tables import create_ds_data_tables, create_log_tables
 
 #читаем файлы в dataframe
 df_ft_balance = pd.read_csv("files_for_read/ft_balance_f.csv", sep=";")
@@ -45,7 +45,7 @@ df_tables_pk = {"ft_balance_f": ["on_date", "account_rk"],
 '''
 
 data_metadata_obj = MetaData()
-data_tables = create_data_tables(data_metadata_obj)
+data_tables = create_ds_data_tables(data_metadata_obj)
 log_metadata_obj = MetaData()
 log_tables = create_log_tables(log_metadata_obj)
 

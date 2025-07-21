@@ -1,18 +1,17 @@
 import pandas as pd
-from psycopg2 import Timestamp
 from sqlalchemy import (Table, Column, Float, Integer, Numeric,
-                        Date, String, PrimaryKeyConstraint, CHAR)
+                        Date, String, PrimaryKeyConstraint, CHAR, TIMESTAMP)
 
 def create_log_tables(metadata) -> dict[str, pd.DataFrame]:
      return {"logs": Table(
         "logs",
         metadata,
-        Column("time_point", Timestamp,),
+        Column("time_point", TIMESTAMP),
         Column("Description", String,),
     )
     }
 
-def create_data_tables(metadata) -> dict[str, pd.DataFrame]:
+def create_ds_data_tables(metadata) -> dict[str, pd.DataFrame]:
     return {"ft_balance_f": Table(
         "ft_balance_f",
         metadata,
@@ -80,4 +79,37 @@ def create_data_tables(metadata) -> dict[str, pd.DataFrame]:
         Column("end_date", Date),
         PrimaryKeyConstraint("ledger_account", "start_date", name="md_ledger_account_pk"),
     )
-}
+    }
+
+def create_dm_tables(metadata) -> dict[str, Table]:
+     return {"dm_account_turnover_f": Table(
+          "dm_account_turnover_f",
+          metadata,
+          Column("on_date", Date),
+          Column("account_rk", Numeric),
+          Column("credit_amount", Numeric(23,8)),
+          Column("credit_amount_rub", Numeric(23,8)),
+          Column("debet_amount", Numeric(23,8)),
+          Column("debet_amount_rub", Numeric(23,8)),
+          schema="dm",
+     ),
+     "dm_account_balance_f": Table(
+          "dm_account_balance_f",
+          metadata,
+          Column("on_date", Date),
+          Column("account_rk", Numeric),
+          Column("balance_out", Numeric(23, 8)),
+          Column("balance_out_rub", Numeric(23, 8)),
+          schema="dm",
+     ),
+     "proc_calc_logs":Table(
+        "proc_calc_logs",
+        metadata,
+        Column("time_point", TIMESTAMP),
+        Column("specification", String),
+        schema="logs",
+     ),
+     }
+
+# разделяй таблицы по надобности/заданию, а не назначению и создавай исходя из него,
+# как create_dm_tables, а не предыдущие
