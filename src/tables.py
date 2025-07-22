@@ -1,18 +1,7 @@
-import pandas as pd
 from sqlalchemy import (Table, Column, Float, Integer, Numeric,
                         Date, String, PrimaryKeyConstraint, CHAR, TIMESTAMP)
 
-def create_log_tables(metadata) -> dict[str, pd.DataFrame]:
-     return {"logs": Table(
-        "logs",
-        metadata,
-        Column("time_point", TIMESTAMP),
-        Column("Description", String,),
-        schema="logs"
-    )
-    }
-
-def create_ds_data_tables(metadata) -> dict[str, pd.DataFrame]:
+def create_ds_tables(metadata) -> dict[str, Table]:
     return {"ft_balance_f": Table(
         "ft_balance_f",
         metadata,
@@ -85,6 +74,13 @@ def create_ds_data_tables(metadata) -> dict[str, pd.DataFrame]:
         Column("end_date", Date),
         PrimaryKeyConstraint("ledger_account", "start_date", name="md_ledger_account_pk"),
         schema="ds"
+    ),
+    "logs": Table(
+        "logs",
+        metadata,
+        Column("time_point", TIMESTAMP),
+        Column("Description", String,),
+        schema="logs"
     )
     }
 
