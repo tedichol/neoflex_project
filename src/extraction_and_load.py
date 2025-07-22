@@ -2,6 +2,7 @@ import time
 from sqlalchemy import *
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 import pandas as pd
+from db_str_config import db_str_config
 from tables import create_ds_data_tables, create_log_tables
 
 #читаем файлы в dataframe
@@ -43,13 +44,19 @@ df_tables_pk = {"ft_balance_f": ["on_date", "account_rk"],
                 "md_exchange_rate_d":["data_actual_date", "currency_rk"],
                 "md_ledger_account_s":["ledger_account", "start_date"]}
 '''
+engine = create_engine(db_str_config("db_conn_params.txt"),)
+
+# создание схемы
+with engine.begin() as conn:
+    conn.execute(DDL("CREATE SCHEMA IF NOT EXISTS ds"))
 
 data_metadata_obj = MetaData()
 data_tables = create_ds_data_tables(data_metadata_obj)
+data_metadata_obj.create_all(engine)
 log_metadata_obj = MetaData()
 log_tables = create_log_tables(log_metadata_obj)
+log_metadata_obj.create_all(engine)
 
-engine = create_engine("postgresql+psycopg2://ds:1234@localhost:5432/staff",)
 '''
 #вспомогательная функция
 def upsert(table, connection, keys, data_iter):

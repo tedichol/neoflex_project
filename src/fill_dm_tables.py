@@ -1,8 +1,10 @@
 from datetime import date, timedelta
+import time
 from sqlalchemy import DDL, MetaData, create_engine, text
+from db_str_config import db_str_config
 from tables import create_dm_tables
 
-engine = create_engine("postgresql+psycopg2://ds:1234@localhost:5432/staff",)
+engine = create_engine(url=db_str_config("db_conn_params.txt"),)
 
 # создание схемы
 with engine.begin() as conn:
@@ -36,6 +38,7 @@ with engine.connect() as conn:
     # расчет витрины оборотов
     for in_date in list_date:
         conn.execute(text("CALL ds.fill_account_turnover_f(:date)"), {"date": in_date})
+        time.sleep(1)#2?
     conn.commit()
     # инициализация витрины остатков
     conn.execute(text('CALL ds.init_account_balance_f()'))
@@ -43,4 +46,5 @@ with engine.connect() as conn:
     # расчет витрины остатков
     for in_date in list_date:
         conn.execute(text("CALL ds.fill_account_balance_f(:date)"), {"date": in_date})
+        time.sleep(1)#2?
     conn.commit()

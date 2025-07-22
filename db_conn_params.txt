@@ -1,0 +1,12 @@
+db_type=postgresql
+driver=psycopg2
+host=localhost
+port=5432
+db_name=staff
+user=ds
+password=1234
+
+считываются первые 7 строк
+
+да... понимаю такие данные, особенно пароль,
+    лучше на гит не заливать, но как пример пусть будут
