@@ -82,8 +82,10 @@ with engine.begin() as conn:
 #запись таблиц
 with engine.connect() as conn:
     conn.execute(text(f"INSERT INTO logs.{log_tab} VALUES (LOCALTIMESTAMP, 'Таблицы считаны и обработаны')"))
+    conn.commit()
     for (df, table_name) in df_table_list:
         conn.execute(text(f"INSERT INTO logs.{log_tab} VALUES (LOCALTIMESTAMP, 'Началось заполнение таблицы {table_name}')"))
+        conn.commit()
         table = tables[table_name]
         data = df.to_dict("records")
         conflict_columns = [col.name for col in table.primary_key.columns]
@@ -96,14 +98,16 @@ with engine.connect() as conn:
         conn.commit()
 
 #запись для таблицы без первичного ключа
-with engine.begin() as conn:
+with engine.connect() as conn:
     conn.execute(text("TRUNCATE TABLE ds.ft_posting_f"))
     conn.execute(text(f"INSERT INTO logs.{log_tab} VALUES (LOCALTIMESTAMP, 'Началось заполнение таблицы ds.ft_posting_f')"))
+    conn.commit()
     table = tables["ft_posting_f"]
     data = df_ft_posting.to_dict("records")
     db_insert = pg_insert(table).values(data)
     conn.execute(db_insert)
     conn.execute(text(f"INSERT INTO logs.{log_tab} VALUES (LOCALTIMESTAMP, 'Таблица ds.ft_posting_f заполнена')"))
+    conn.commit()
 
 #таймер на 5 секунд
 time.sleep(5)

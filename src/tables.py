@@ -114,11 +114,11 @@ def create_dm_tables(metadata) -> dict[str, Table]:
      ),
      }
 
-# разделяй таблицы по надобности/заданию/времени, а не назначению и создавай исходя из него,
+# разделяй таблицы по надобности/месту использования, а не назначению и создавай исходя из него,
 # как create_dm_tables, а не предыдущие
 
-def create_101f_tables(metadata) -> None:
-     Table(
+def create_101f_tables(metadata) -> dict[str, Table]:
+     return {"data_table": Table(
           "dm_f101_round_f",
           metadata,
           Column("from_date", Date),
@@ -138,11 +138,35 @@ def create_101f_tables(metadata) -> None:
           Column("balance_out_rub", Numeric(23, 8)),
           Column("balance_out_val", Numeric(23, 8)),
           Column("balance_out_total", Numeric(23, 8)),
-          schema="dm",)
-     Table(
+          schema="dm",
+          ), "log_table": Table(
           "f101_proc_logs",
           metadata,
           Column("time_point", TIMESTAMP),
           Column("specification", String),
+          schema="logs",
+          )
+     }
+
+def create_exp_tables(metadata) -> dict[str, Table]:
+     return {"export_logs": Table(
+          "export_f101_logs",
+          metadata,
+          Column("time_point", TIMESTAMP),
+          Column("specification", String),
           schema="logs"
-     )
+          )}
+
+def create_imp_tables (metadata, imp_table_title) -> dict[str, Table]:
+     data_table = create_101f_tables(metadata)["data_table"]
+     data_table.name = imp_table_title
+     data_table.schema="dm"
+     return {"import_table": data_table,
+        "import_logs": Table(
+          "import_f101_logs",
+          metadata,
+          Column("time_point", TIMESTAMP),
+          Column("specification", String),
+          schema="logs",
+        )
+     }

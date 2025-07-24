@@ -38,13 +38,14 @@ with engine.connect() as conn:
     # расчет витрины оборотов
     for in_date in list_date:
         conn.execute(text("CALL ds.fill_account_turnover_f(:date)"), {"date": in_date})
-        time.sleep(1)#2?
-    conn.commit()
+        time.sleep(0.5)
+        conn.commit()
     # инициализация витрины остатков
     conn.execute(text('CALL ds.init_account_balance_f()'))
+    time.sleep(0.5)
     conn.commit()
     # расчет витрины остатков
     for in_date in list_date:
         conn.execute(text("CALL ds.fill_account_balance_f(:date)"), {"date": in_date})
-        time.sleep(1)#2?
-    conn.commit()
+        time.sleep(0.5)
+        conn.commit()

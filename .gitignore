@@ -3,3 +3,5 @@ files_for_read/*
 text_files/*
 __pycache__/*
 *.pyc
+export_files/*
+import_files/*
