@@ -53,7 +53,7 @@ with engine.connect() as conn:
                          "balance_out_total": next(iter_col_vals)}
        conn.execute(query, params)
        conn.execute(text(f"INSERT INTO logs.{imp_tables['import_logs'].name} VALUES (NOW(), '"
-                      f"Записана строка :i-ая строка данных')"), {"i": i})
+                      f"Записана :i-ая строка данных')"), {"i": i})
        time.sleep(0.5)
        conn.commit()
        i += 1
