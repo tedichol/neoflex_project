@@ -2,9 +2,9 @@ db_type=postgresql
 driver=psycopg2
 host=localhost
 port=5432
-db_name=staff
-user=ds
-password=1234
+db_name=dwh
+user=postgres
+password=postgres_overlord
 
 считываются первые 7 строк
 
